@@ -18,7 +18,8 @@ namespace Encapsulation
         {
             if (maxWeight < 0)
                 throw new ArgumentOutOfRangeException();
-            
+
+            _maxWeight = maxWeight;
             _items = new List<Item>(maxWeight);
         }
 
@@ -31,15 +32,23 @@ namespace Encapsulation
                 throw new ArgumentOutOfRangeException($"Count of items can't be less than 1.", nameof(count));
             
             var currentWeight = _items.Sum(item => item.Count);
+            
+            if (currentWeight + count > _maxWeight)
+                throw new InvalidOperationException();
+            
             var targetItem = _items.FirstOrDefault(item => item.Name == name);
 
             if (targetItem == null)
-                throw new InvalidOperationException();
-
-            if (currentWeight + count > _maxWeight)
-                throw new InvalidOperationException();
-
-            targetItem = new Item(name, count);
+            {
+                targetItem = new Item(name, count);
+                _items.Add(targetItem);
+            }
+            else
+            {
+                var indexOf = _items.IndexOf(targetItem);
+                var newItem = new Item(name, count);
+                _items[indexOf] = newItem;
+            }
             
             Updated?.Invoke(targetItem);
         }
