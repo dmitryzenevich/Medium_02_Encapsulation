@@ -9,11 +9,6 @@ namespace Encapsulation
         private readonly List<Item> _items = null;
         private readonly int _maxWeight = 0;
 
-        public IReadOnlyCollection<Item> Items => _items;
-        public int MaxWeight => _maxWeight;
-
-        public event Action<Item> Updated = null;
-
         public Bag(int maxWeight)
         {
             if (maxWeight < 0)
@@ -49,8 +44,6 @@ namespace Encapsulation
                 var newItem = new Item(name, count);
                 _items[indexOf] = newItem;
             }
-            
-            Updated?.Invoke(targetItem);
         }
     }
 
