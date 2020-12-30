@@ -4,29 +4,61 @@ using System.Linq;
 
 namespace Encapsulation
 {
-    class Bag
+    public class Bag
     {
-        public List<Item> Items;
-        public int MaxWeidth;
+        private readonly List<Item> _items = null;
+        private readonly int _maxWeight = 0;
+
+        public Bag(int maxWeight)
+        {
+            if (maxWeight < 0)
+                throw new ArgumentOutOfRangeException();
+
+            _maxWeight = maxWeight;
+            _items = new List<Item>(maxWeight);
+        }
 
         public void AddItem(string name, int count)
         {
-            int currentWeidth = Items.Sum(item => item.Count);
-            Item targetItem = Items.FirstOrDefault(item => item.Name == name);
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException($"Item name can't be null, empty or white space.", nameof(name));
+
+            if (count < 1)
+                throw new ArgumentOutOfRangeException($"Count of items can't be less than 1.", nameof(count));
+            
+            var currentWeight = _items.Sum(item => item.Count);
+            
+            if (currentWeight + count > _maxWeight)
+                throw new InvalidOperationException();
+            
+            var targetItem = _items.FirstOrDefault(item => item.Name == name);
 
             if (targetItem == null)
-                throw new InvalidOperationException();
-
-            if (currentWeidth + count > MaxWeidth)
-                throw new InvalidOperationException();
-
-            targetItem.Count += count;
+            {
+                targetItem = new Item(name, count);
+                _items.Add(targetItem);
+            }
+            else
+            {
+                var indexOf = _items.IndexOf(targetItem);
+                var newItem = new Item(name, count);
+                _items[indexOf] = newItem;
+            }
         }
     }
 
-    class Item
+    public class Item
     {
-        public int Count;
-        public string Name;
+        private readonly int _count;
+        private readonly string _name;
+        
+        public int Count => _count;
+        public string Name => _name;
+
+        public Item(string name, int count)
+        {
+            _name = name;
+            _count = count;
+        }
     }
 }
